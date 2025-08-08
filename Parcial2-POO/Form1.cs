@@ -21,7 +21,7 @@ namespace Parcial2_POO
             ActualizarGrilla(dgvNegocios, administradora.Negocios);
             ActualizarGrilla(dgvProveedores, administradora.Proveedores);
 
-            cmbMedioDePago.DataSource = Enum.GetValues(typeof(MedioDePago));
+            cmbMedioDePago.DataSource = MedioDePago.ObtenerTodos().ToList();
             cmbMedioDePago.SelectedIndex = -1;
         }
 
@@ -646,12 +646,13 @@ namespace Parcial2_POO
 
                     // Calcular recargo si el pago está vencido
                     decimal recargo = 0;
+
                     if (fechaActual > pago.FechaVencimiento)
                     {
                         recargo = pago.MedioDePago switch
                         {
-                            MedioDePago.Efectivo => pago.Importe * 0.01m,
-                            MedioDePago.Tarjeta => pago.Importe * 0.10m,
+                            var m when m == MedioDePago.Efectivo => pago.Importe * 0.01m,
+                            var m when m == MedioDePago.Tarjeta => pago.Importe * 0.10m,
                             _ => 0
                         };
                     }
@@ -742,6 +743,7 @@ namespace Parcial2_POO
             {
                 lblRecargoInfo.ForeColor = Color.Red;
                 var fila = dgvPagosGenerados.SelectedRows[0];
+
                 if (fila.DataBoundItem is Pago pago)
                 {
                     if (pago.Cancelado)
@@ -754,8 +756,8 @@ namespace Parcial2_POO
                     {
                         string mensaje = pago.MedioDePago switch
                         {
-                            MedioDePago.Efectivo => "1% de Recargo",
-                            MedioDePago.Tarjeta => "10% de Recargo",
+                            var m when m == MedioDePago.Efectivo => "1% de Recargo",
+                            var m when m == MedioDePago.Tarjeta => "10% de Recargo",
                             _ => " "
                         };
 
@@ -772,6 +774,7 @@ namespace Parcial2_POO
                 lblRecargoInfo.Text = " ";
             }
         }
+
 
 
         private void cmbMedioDePago_SelectedIndexChanged(object sender, EventArgs e)
